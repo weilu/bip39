@@ -1,5 +1,6 @@
-var bip39 = require('../')
-var download = require('../util/wordlists').download
+// var bip39 = require('../')
+import { bip39 } from "../src/esm/index.js";
+var download = require('../util/wordlists.js').download
 var WORDLISTS = {
   english: require('../src/wordlists/english.json'),
   japanese: require('../src/wordlists/japanese.json'),
@@ -7,7 +8,8 @@ var WORDLISTS = {
 }
 
 var vectors = require('./vectors.json')
-var test = require('tape')
+// var test = require('tape')
+import * as test from "tape";
 
 function testVector (description, wordlist, password, v, i) {
   var ventropy = v[0]

@@ -2,10 +2,16 @@
   "name": "bip39",
   "version": "3.1.0",
   "description": "Bitcoin BIP39: Mnemonic code for generating deterministic keys",
-  "main": "src/index.js",
-  "types": "./types/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/cjs/index.d.ts",
+      "import": "./src/esm/index.js",
+      "require": "./src/cjs/index.js"
+    }
+  },
   "scripts": {
-    "build": "npm run clean && tsc -p tsconfig.json",
+    "build": "npm run clean && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
     "clean": "rm -rf src",
     "coverage": "nyc --branches 85 --functions 100 --check-coverage npm run unit",
     "format": "npm run prettier -- --write",
@@ -31,8 +37,7 @@
   },
   "license": "ISC",
   "files": [
-    "src",
-    "types"
+    "src"
   ],
   "dependencies": {
     "@noble/hashes": "^1.2.0"
@@ -43,7 +48,7 @@
     "nyc": "^15.0.0",
     "prettier": "1.16.4",
     "proxyquire": "^1.7.10",
-    "tape": "^4.13.2",
+    "tape": "^5.3.0",
     "tslint": "^6.1.0",
     "typescript": "3.3.4000"
   }

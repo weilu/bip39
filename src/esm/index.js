@@ -1,11 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const sha256_1 = require("@noble/hashes/sha256");
-const sha512_1 = require("@noble/hashes/sha512");
-const pbkdf2_1 = require("@noble/hashes/pbkdf2");
-const utils_1 = require("@noble/hashes/utils");
-const _wordlists_1 = require("./_wordlists");
-let DEFAULT_WORDLIST = _wordlists_1._default;
+import { sha256 } from '@noble/hashes/sha256';
+import { sha512 } from '@noble/hashes/sha512';
+import { pbkdf2, pbkdf2Async } from '@noble/hashes/pbkdf2';
+import { randomBytes } from '@noble/hashes/utils';
+import { _default as _DEFAULT_WORDLIST, wordlists } from './_wordlists.js';
+let DEFAULT_WORDLIST = _DEFAULT_WORDLIST;
 const INVALID_MNEMONIC = 'Invalid mnemonic';
 const INVALID_ENTROPY = 'Invalid entropy';
 const INVALID_CHECKSUM = 'Invalid mnemonic checksum';
@@ -29,32 +27,30 @@ function bytesToBinary(bytes) {
 function deriveChecksumBits(entropyBuffer) {
     const ENT = entropyBuffer.length * 8;
     const CS = ENT / 32;
-    const hash = sha256_1.sha256(Uint8Array.from(entropyBuffer));
+    const hash = sha256(Uint8Array.from(entropyBuffer));
     return bytesToBinary(Array.from(hash)).slice(0, CS);
 }
 function salt(password) {
     return 'mnemonic' + (password || '');
 }
-function mnemonicToSeedSync(mnemonic, password) {
+export function mnemonicToSeedSync(mnemonic, password) {
     const mnemonicBuffer = Uint8Array.from(Buffer.from(normalize(mnemonic), 'utf8'));
     const saltBuffer = Uint8Array.from(Buffer.from(salt(normalize(password)), 'utf8'));
-    const res = pbkdf2_1.pbkdf2(sha512_1.sha512, mnemonicBuffer, saltBuffer, {
+    const res = pbkdf2(sha512, mnemonicBuffer, saltBuffer, {
         c: 2048,
         dkLen: 64,
     });
     return Buffer.from(res);
 }
-exports.mnemonicToSeedSync = mnemonicToSeedSync;
-function mnemonicToSeed(mnemonic, password) {
+export function mnemonicToSeed(mnemonic, password) {
     const mnemonicBuffer = Uint8Array.from(Buffer.from(normalize(mnemonic), 'utf8'));
     const saltBuffer = Uint8Array.from(Buffer.from(salt(normalize(password)), 'utf8'));
-    return pbkdf2_1.pbkdf2Async(sha512_1.sha512, mnemonicBuffer, saltBuffer, {
+    return pbkdf2Async(sha512, mnemonicBuffer, saltBuffer, {
         c: 2048,
         dkLen: 64,
     }).then((res) => Buffer.from(res));
 }
-exports.mnemonicToSeed = mnemonicToSeed;
-function mnemonicToEntropy(mnemonic, wordlist) {
+export function mnemonicToEntropy(mnemonic, wordlist) {
     wordlist = wordlist || DEFAULT_WORDLIST;
     if (!wordlist) {
         throw new Error(WORDLIST_REQUIRED);
@@ -95,8 +91,7 @@ function mnemonicToEntropy(mnemonic, wordlist) {
     }
     return entropy.toString('hex');
 }
-exports.mnemonicToEntropy = mnemonicToEntropy;
-function entropyToMnemonic(entropy, wordlist) {
+export function entropyToMnemonic(entropy, wordlist) {
     if (!Buffer.isBuffer(entropy)) {
         entropy = Buffer.from(entropy, 'hex');
     }
@@ -126,17 +121,15 @@ function entropyToMnemonic(entropy, wordlist) {
         ? words.join('\u3000')
         : words.join(' ');
 }
-exports.entropyToMnemonic = entropyToMnemonic;
-function generateMnemonic(strength, rng, wordlist) {
+export function generateMnemonic(strength, rng, wordlist) {
     strength = strength || 128;
     if (strength % 32 !== 0) {
         throw new TypeError(INVALID_ENTROPY);
     }
-    rng = rng || ((size) => Buffer.from(utils_1.randomBytes(size)));
+    rng = rng || ((size) => Buffer.from(randomBytes(size)));
     return entropyToMnemonic(rng(strength / 8), wordlist);
 }
-exports.generateMnemonic = generateMnemonic;
-function validateMnemonic(mnemonic, wordlist) {
+export function validateMnemonic(mnemonic, wordlist) {
     try {
         mnemonicToEntropy(mnemonic, wordlist);
     }
@@ -145,9 +138,8 @@ function validateMnemonic(mnemonic, wordlist) {
     }
     return true;
 }
-exports.validateMnemonic = validateMnemonic;
-function setDefaultWordlist(language) {
-    const result = _wordlists_1.wordlists[language];
+export function setDefaultWordlist(language) {
+    const result = wordlists[language];
     if (result) {
         DEFAULT_WORDLIST = result;
     }
@@ -155,18 +147,15 @@ function setDefaultWordlist(language) {
         throw new Error('Could not find wordlist for language "' + language + '"');
     }
 }
-exports.setDefaultWordlist = setDefaultWordlist;
-function getDefaultWordlist() {
+export function getDefaultWordlist() {
     if (!DEFAULT_WORDLIST) {
         throw new Error('No Default Wordlist set');
     }
-    return Object.keys(_wordlists_1.wordlists).filter((lang) => {
+    return Object.keys(wordlists).filter((lang) => {
         if (lang === 'JA' || lang === 'EN') {
             return false;
         }
-        return _wordlists_1.wordlists[lang].every((word, index) => word === DEFAULT_WORDLIST[index]);
+        return wordlists[lang].every((word, index) => word === DEFAULT_WORDLIST[index]);
     })[0];
 }
-exports.getDefaultWordlist = getDefaultWordlist;
-var _wordlists_2 = require("./_wordlists");
-exports.wordlists = _wordlists_2.wordlists;
+export { wordlists } from './_wordlists';

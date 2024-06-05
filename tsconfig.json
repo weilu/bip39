@@ -1,10 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "module": "commonjs",
     "outDir": "./src",
-    "declaration": true,
-    "declarationDir": "./types",
     "rootDir": "./ts_src",
     "types": [
       "node"
@@ -21,6 +18,7 @@
     "esModuleInterop": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "moduleResolution": "Node",
     "resolveJsonModule": true
   },
   "include": [

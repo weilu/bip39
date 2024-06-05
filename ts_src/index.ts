@@ -2,7 +2,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { sha512 } from '@noble/hashes/sha512';
 import { pbkdf2, pbkdf2Async } from '@noble/hashes/pbkdf2';
 import { randomBytes } from '@noble/hashes/utils';
-import { _default as _DEFAULT_WORDLIST, wordlists } from './_wordlists';
+import { _default as _DEFAULT_WORDLIST, wordlists } from './_wordlists.js';
 
 let DEFAULT_WORDLIST: string[] | undefined = _DEFAULT_WORDLIST;
 
