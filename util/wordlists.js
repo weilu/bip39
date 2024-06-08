@@ -1,7 +1,7 @@
 /* istanbul ignore file */
-var fetch = require('node-fetch')
-var fs = require('fs')
-var path = require('path')
+import fetch from 'node-fetch'
+import { writeFile } from 'fs'
+import { join } from 'path'
 
 var log = console.log
 var WORDLISTS = [
@@ -17,28 +17,32 @@ var WORDLISTS = [
   'spanish'
 ]
 
-function update () {
+export function update () {
   download().then(function (wordlists) {
     var promises = Object.keys(wordlists).map(function (name) { return save(name, wordlists[name]) })
     return Promise.all(promises)
   })
 }
 
-function download () {
+export async function download () {
   var wordlists = {}
 
-  var promises = WORDLISTS.map(function (name) {
-    return fetchRaw(name).then(toJSON).then(function (wordlist) { wordlists[name] = wordlist })
+  var promises = WORDLISTS.map(async function (name) {
+    const content = await fetchRaw(name)
+    const wordlist = await toJSON(content)
+    wordlists[name] = wordlist
   })
 
-  return Promise.all(promises).then(function () { return wordlists })
+  await Promise.all(promises)
+  return wordlists
 }
 
-function fetchRaw (name) {
+async function fetchRaw (name) {
   var url = 'https://raw.githubusercontent.com/bitcoin/bips/master/bip-0039/' + name + '.txt'
   log('download ' + url)
 
-  return fetch(url).then(function (response) { return response.text() })
+  const response = await fetch(url)
+  return await response.text()
 }
 
 function toJSON (content) {
@@ -46,16 +50,15 @@ function toJSON (content) {
 }
 
 function save (name, wordlist) {
-  var location = path.join(__dirname, '..', 'ts_src', 'wordlists', name + '.json')
+  var location = join(__dirname, '..', 'ts_src', 'wordlists', name + '.json')
   var content = JSON.stringify(wordlist, null, 2) + '\n'
   log('save ' + wordlist.length + ' words to ' + location)
 
   return new Promise(function (resolve, reject) {
-    fs.writeFile(location, content, function (err) {
+    writeFile(location, content, function (err) {
       if (err) reject(err)
       else resolve()
     })
   })
 }
 
-module.exports = { update: update, download: download }

@@ -4,6 +4,7 @@ import { pbkdf2, pbkdf2Async } from '@noble/hashes/pbkdf2';
 import { randomBytes } from '@noble/hashes/utils';
 import { _default as _DEFAULT_WORDLIST, wordlists } from './_wordlists.js';
 let DEFAULT_WORDLIST = _DEFAULT_WORDLIST;
+console.log('default wordlist', DEFAULT_WORDLIST);
 const INVALID_MNEMONIC = 'Invalid mnemonic';
 const INVALID_ENTROPY = 'Invalid entropy';
 const INVALID_CHECKSUM = 'Invalid mnemonic checksum';
@@ -158,4 +159,4 @@ export function getDefaultWordlist() {
         return wordlists[lang].every((word, index) => word === DEFAULT_WORDLIST[index]);
     })[0];
 }
-export { wordlists } from './_wordlists';
+export { wordlists } from './_wordlists.js';

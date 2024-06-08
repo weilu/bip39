@@ -12,6 +12,7 @@
   },
   "scripts": {
     "build": "npm run clean && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
+    "postbuild": "chmod +x ./fixup.sh && ./fixup.sh",
     "clean": "rm -rf src",
     "coverage": "nyc --branches 85 --functions 100 --check-coverage npm run unit",
     "format": "npm run prettier -- --write",
@@ -20,7 +21,7 @@
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "prettier": "prettier 'ts_src/**/*.ts' --ignore-path ./.prettierignore",
     "test": "npm run build && npm run format:ci && npm run lint && npm run unit",
-    "unit": "tape test/*.js",
+    "unit": "tape test/index.js",
     "update": "node -e \"require('./util/wordlists').update()\""
   },
   "author": "Wei Lu",

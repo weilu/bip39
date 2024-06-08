@@ -5,6 +5,7 @@ import { randomBytes } from '@noble/hashes/utils';
 import { _default as _DEFAULT_WORDLIST, wordlists } from './_wordlists.js';
 
 let DEFAULT_WORDLIST: string[] | undefined = _DEFAULT_WORDLIST;
+console.log('default wordlist', DEFAULT_WORDLIST);
 
 const INVALID_MNEMONIC = 'Invalid mnemonic';
 const INVALID_ENTROPY = 'Invalid entropy';
@@ -222,4 +223,4 @@ export function getDefaultWordlist(): string {
   )[0];
 }
 
-export { wordlists } from './_wordlists';
+export { wordlists } from './_wordlists.js';

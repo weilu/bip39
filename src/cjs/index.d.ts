@@ -7,4 +7,4 @@ export declare function generateMnemonic(strength?: number, rng?: (size: number)
 export declare function validateMnemonic(mnemonic: string, wordlist?: string[]): boolean;
 export declare function setDefaultWordlist(language: string): void;
 export declare function getDefaultWordlist(): string;
-export { wordlists } from './_wordlists';
+export { wordlists } from './_wordlists.js';

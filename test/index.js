@@ -1,15 +1,20 @@
 // var bip39 = require('../')
-import { bip39 } from "../src/esm/index.js";
-var download = require('../util/wordlists.js').download
+import * as bip39  from "../src/esm/index.js";
+import { download } from "../util/wordlists.js";
+// const { } = require('../util/wordlists.js').download
+import english from '../src/wordlists/english.json' assert {type: "json"};
+import japanese from '../src/wordlists/japanese.json'assert {type: "json"};
+import custom from './wordlist.json' assert {type: "json"};
 var WORDLISTS = {
-  english: require('../src/wordlists/english.json'),
-  japanese: require('../src/wordlists/japanese.json'),
-  custom: require('./wordlist.json')
+  english,
+  japanese,
+  custom
 }
 
-var vectors = require('./vectors.json')
+import vectors from "./vectors.json" assert {type: "json"};
+// var vectors = require('./vectors.json')
 // var test = require('tape')
-import * as test from "tape";
+import {test} from "tape";
 
 function testVector (description, wordlist, password, v, i) {
   var ventropy = v[0]

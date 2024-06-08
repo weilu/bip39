@@ -19,7 +19,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "moduleResolution": "Node",
-    "resolveJsonModule": true
+    "module": "ESNext",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
   },
   "include": [
       "ts_src/**/*.ts",
@@ -27,6 +29,7 @@
   ],
   "exclude": [
       "**/*.spec.ts",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "wordlists"
   ]
 }
