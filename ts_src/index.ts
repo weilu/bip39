@@ -2,10 +2,8 @@ import { sha256 } from '@noble/hashes/sha256';
 import { sha512 } from '@noble/hashes/sha512';
 import { pbkdf2, pbkdf2Async } from '@noble/hashes/pbkdf2';
 import { randomBytes } from '@noble/hashes/utils';
-import { _default as _DEFAULT_WORDLIST, wordlists } from './_wordlists.js';
 
-let DEFAULT_WORDLIST: string[] | undefined = _DEFAULT_WORDLIST;
-console.log('default wordlist', DEFAULT_WORDLIST);
+let DEFAULT_WORDLIST: string[] | undefined;
 
 const INVALID_MNEMONIC = 'Invalid mnemonic';
 const INVALID_ENTROPY = 'Invalid entropy';
@@ -197,30 +195,34 @@ export function validateMnemonic(
   return true;
 }
 
-export function setDefaultWordlist(language: string): void {
-  const result = wordlists[language];
-  if (result) {
-    DEFAULT_WORDLIST = result;
-  } else {
-    throw new Error('Could not find wordlist for language "' + language + '"');
+function validateWordlist(wordlist: string[]): boolean {
+  if (!Array.isArray(wordlist)) {
+    return false;
   }
+
+  if (wordlist.length !== 2048) {
+    return false;
+  }
+
+  const unique = new Set(wordlist);
+  if (unique.size !== wordlist.length) {
+    return false;
+  }
+
+  return true;
 }
 
-export function getDefaultWordlist(): string {
+export function setDefaultWordlist(wordlist: string[]): void {
+  if (!validateWordlist(wordlist)) {
+    throw new Error('Invalid wordlist');
+  }
+  DEFAULT_WORDLIST = wordlist;
+}
+
+export function getDefaultWordlist(): string[] {
   if (!DEFAULT_WORDLIST) {
     throw new Error('No Default Wordlist set');
   }
-  return Object.keys(wordlists).filter(
-    (lang: string): boolean => {
-      if (lang === 'JA' || lang === 'EN') {
-        return false;
-      }
-      return wordlists[lang].every(
-        (word: string, index: number): boolean =>
-          word === DEFAULT_WORDLIST![index],
-      );
-    },
-  )[0];
-}
 
-export { wordlists } from './_wordlists.js';
+  return DEFAULT_WORDLIST;
+}

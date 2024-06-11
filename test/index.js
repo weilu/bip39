@@ -1,20 +1,41 @@
-// var bip39 = require('../')
-import * as bip39  from "../src/esm/index.js";
+import * as bip39  from "../src/index.js";
 import { download } from "../util/wordlists.js";
-// const { } = require('../util/wordlists.js').download
-import english from '../src/wordlists/english.json' assert {type: "json"};
-import japanese from '../src/wordlists/japanese.json'assert {type: "json"};
+
+import english from '../src/wordlists/english.js';
+import japanese from '../src/wordlists/japanese.js';
+import italian from "../src/wordlists/italian.js";
+import spanish from "../src/wordlists/spanish.js";
+import chinese_simplified from "../src/wordlists/chinese_simplified.js";
+import chinese_traditional from "../src/wordlists/chinese_traditional.js";
+import french from "../src/wordlists/french.js";
+import korean from "../src/wordlists/korean.js";
+import portuguese from "../src/wordlists/portuguese.js";
+import czech from "../src/wordlists/czech.js";
 import custom from './wordlist.json' assert {type: "json"};
+
 var WORDLISTS = {
   english,
   japanese,
   custom
-}
+};
+
+const exposedWordlists = {
+  chinese_simplified, 
+  chinese_traditional,
+  czech,
+  english,
+  french,
+  italian,
+  japanese,
+  korean,
+  portuguese,
+  spanish
+};
 
 import vectors from "./vectors.json" assert {type: "json"};
-// var vectors = require('./vectors.json')
-// var test = require('tape')
 import {test} from "tape";
+
+bip39.setDefaultWordlist(WORDLISTS.english);
 
 function testVector (description, wordlist, password, v, i) {
   var ventropy = v[0]
@@ -43,39 +64,39 @@ vectors.custom.forEach(function (v, i) { testVector('Custom', WORDLISTS.custom, 
 
 test('getDefaultWordlist returns "english"', function (t) {
   t.plan(1)
-  const english = bip39.getDefaultWordlist()
-  t.equal(english, 'english')
+  const english = bip39.getDefaultWordlist();
+  t.equal(english[0], 'abandon');
   // TODO: Test that Error throws when called if no wordlists are compiled with bip39
 })
 
 test('setDefaultWordlist changes default wordlist', function (t) {
   t.plan(4)
   const english = bip39.getDefaultWordlist()
-  t.equal(english, 'english')
+  t.equal(english[0], 'abandon');
 
-  bip39.setDefaultWordlist('italian')
+  bip39.setDefaultWordlist(italian);
 
-  const italian = bip39.getDefaultWordlist()
-  t.equal(italian, 'italian')
+  const italianWordlist = bip39.getDefaultWordlist()
+  t.equal(italianWordlist[0], 'abaco')
 
   const phraseItalian = bip39.entropyToMnemonic('00000000000000000000000000000000')
   t.equal(phraseItalian.slice(0, 5), 'abaco')
 
-  bip39.setDefaultWordlist('english')
+  bip39.setDefaultWordlist(english)
 
   const phraseEnglish = bip39.entropyToMnemonic('00000000000000000000000000000000')
   t.equal(phraseEnglish.slice(0, 7), 'abandon')
 })
 
-test('setDefaultWordlist throws on unknown wordlist', function (t) {
+test('setDefaultWordlist throws on invalid wordlist length', function (t) {
   t.plan(2)
   const english = bip39.getDefaultWordlist()
-  t.equal(english, 'english')
+  t.equal(english[0], 'abandon')
 
   try {
-    bip39.setDefaultWordlist('abcdefghijklmnop')
+    bip39.setDefaultWordlist([...new Array(2047)].fill('a'));
   } catch (error) {
-    t.equal(error.message, 'Could not find wordlist for language "abcdefghijklmnop"')
+    t.equal(error.message, 'Invalid wordlist');
     return
   }
   t.assert(false)
@@ -138,17 +159,11 @@ test('validateMnemonic', function (t) {
   t.equal(bip39.validateMnemonic('sleep kitten sleep kitten sleep kitten sleep kitten sleep kitten sleep kitten'), false, 'fails for invalid checksum')
 })
 
-test('exposes standard wordlists', function (t) {
-  t.plan(2)
-  t.same(bip39.wordlists.EN, WORDLISTS.english)
-  t.equal(bip39.wordlists.EN.length, 2048)
-})
-
 test('verify wordlists from https://github.com/bitcoin/bips/blob/master/bip-0039/bip-0039-wordlists.md', function (t) {
   download().then(function (wordlists) {
     Object.keys(wordlists).forEach(function (name) {
-      t.same(bip39.wordlists[name], wordlists[name])
-    })
+      t.same(exposedWordlists[name], wordlists[name])
+    });
 
     t.end()
   })

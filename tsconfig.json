@@ -3,9 +3,8 @@
     "target": "es2017",
     "outDir": "./src",
     "rootDir": "./ts_src",
-    "types": [
-      "node"
-    ],
+    "declaration": true,
+    "types": ["node"],
     "allowJs": false,
     "strict": true,
     "noImplicitAny": true,
@@ -15,21 +14,14 @@
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
-    "esModuleInterop": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "moduleResolution": "Node",
     "module": "ESNext",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   },
-  "include": [
-      "ts_src/**/*.ts",
-      "ts_src/**/*.json"
-  ],
-  "exclude": [
-      "**/*.spec.ts",
-      "node_modules/**/*",
-      "wordlists"
-  ]
+  "include": ["ts_src/**/*.ts", "ts_src/**/*.json"],
+  "exclude": ["**/*.spec.ts", "node_modules/**/*"]
 }

@@ -5,14 +5,45 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./src/cjs/index.d.ts",
-      "import": "./src/esm/index.js",
-      "require": "./src/cjs/index.js"
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./wordlists": {
+      "import": "./src/wordlists"
+    },
+    "./wordlists/chinese_simplified": {
+      "import": "./src/wordlists/chinese_simplified.js"
+    },
+    "./wordlists/chinese_traditional": {
+      "import": "./src/wordlists/chinese_traditional.js"
+    },
+    "./wordlists/czech": {
+      "import": "./src/wordlists/czech.js"
+    },
+    "./wordlists/english": {
+      "import": "./src/wordlists/english.js"
+    },
+    "./wordlists/french": {
+      "import": "./src/wordlists/french.js"
+    },
+    "./wordlists/italian": {
+      "import": "./src/wordlists/italian.js"
+    },
+    "./wordlists/japanese": {
+      "import": "./src/wordlists/japanese.js"
+    },
+    "./wordlists/korean": {
+      "import": "./src/wordlists/korean.js"
+    },
+    "./wordlists/portuguese": {
+      "import": "./src/wordlists/portuguese.js"
+    },
+    "./wordlists/spanish": {
+      "import": "./src/wordlists/spanish.js"
     }
   },
   "scripts": {
-    "build": "npm run clean && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
-    "postbuild": "chmod +x ./fixup.sh && ./fixup.sh",
+    "build": "npm run clean && tsc -p tsconfig.json",
     "clean": "rm -rf src",
     "coverage": "nyc --branches 85 --functions 100 --check-coverage npm run unit",
     "format": "npm run prettier -- --write",
