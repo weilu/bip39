@@ -21474,7 +21474,9 @@ function generateMnemonic(strength, rng, wordlist) {
     if (strength % 32 !== 0) {
         throw new TypeError(INVALID_ENTROPY);
     }
-    rng = rng || ((size) => crypto.getRandomValues(new Uint8Array(size)));
+    rng =
+        rng ||
+            ((size) => crypto.getRandomValues(new Uint8Array(size)));
     return entropyToMnemonic(rng(strength / 8), wordlist);
 }
 function validateMnemonic(mnemonic, wordlist) {
@@ -21497,7 +21499,6 @@ function validateWordlist(wordlist) {
     if (unique.size !== wordlist.length) {
         return false;
     }
-    console.log("hi");
     return true;
 }
 function setDefaultWordlist(wordlist) {

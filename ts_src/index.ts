@@ -170,7 +170,10 @@ export function generateMnemonic(
   if (strength % 32 !== 0) {
     throw new TypeError(INVALID_ENTROPY);
   }
-  rng = rng || ((size: number): Uint8Array => crypto.getRandomValues(new Uint8Array(size)));    
+  rng =
+    rng ||
+    ((size: number): Uint8Array =>
+      crypto.getRandomValues(new Uint8Array(size)));
   return entropyToMnemonic(rng(strength / 8), wordlist);
 }
 
@@ -191,16 +194,16 @@ function validateWordlist(wordlist: string[]): boolean {
   if (!Array.isArray(wordlist)) {
     return false;
   }
-  
+
   if (wordlist.length !== 2048) {
     return false;
   }
-  
+
   const unique = new Set(wordlist);
   if (unique.size !== wordlist.length) {
     return false;
   }
-  
+
   return true;
 }
 
