@@ -1,4 +1,4 @@
-export default [
+export const italian = [
   'abaco',
   'abbaglio',
   'abbinato',

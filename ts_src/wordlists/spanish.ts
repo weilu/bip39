@@ -1,4 +1,4 @@
-export default [
+export const spanish = [
   'ábaco',
   'abdomen',
   'abeja',

@@ -1,4 +1,4 @@
-export default [
+export const french = [
   'abaisser',
   'abandon',
   'abdiquer',

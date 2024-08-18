@@ -1,4 +1,4 @@
-export default [
+export const portuguese = [
   'abacate',
   'abaixo',
   'abalar',

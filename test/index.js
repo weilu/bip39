@@ -1,17 +1,19 @@
-import * as bip39  from "../src/index.js";
+import * as bip39  from "../src/esm/index.js";
 import { download } from "../util/wordlists.js";
-
-import english from '../src/wordlists/english.js';
-import japanese from '../src/wordlists/japanese.js';
-import italian from "../src/wordlists/italian.js";
-import spanish from "../src/wordlists/spanish.js";
-import chinese_simplified from "../src/wordlists/chinese_simplified.js";
-import chinese_traditional from "../src/wordlists/chinese_traditional.js";
-import french from "../src/wordlists/french.js";
-import korean from "../src/wordlists/korean.js";
-import portuguese from "../src/wordlists/portuguese.js";
-import czech from "../src/wordlists/czech.js";
+import {
+  english, 
+  japanese, 
+  italian, 
+  spanish, 
+  chineseSimplified, 
+  chineseTraditional, 
+  french, 
+  korean, 
+  portuguese, 
+  czech
+} from "../src/esm/index.js";
 import custom from './wordlist.json' assert {type: "json"};
+import * as tools from "uint8array-tools";
 
 var WORDLISTS = {
   english,
@@ -20,8 +22,8 @@ var WORDLISTS = {
 };
 
 const exposedWordlists = {
-  chinese_simplified, 
-  chinese_traditional,
+  chinese_simplified: chineseSimplified, 
+  chinese_traditional: chineseTraditional,
   czech,
   english,
   french,
@@ -46,9 +48,9 @@ function testVector (description, wordlist, password, v, i) {
     t.plan(6)
 
     t.equal(bip39.mnemonicToEntropy(vmnemonic, wordlist), ventropy, 'mnemonicToEntropy returns ' + ventropy.slice(0, 40) + '...')
-    t.equal(bip39.mnemonicToSeedSync(vmnemonic, password).toString('hex'), vseedHex, 'mnemonicToSeedSync returns ' + vseedHex.slice(0, 40) + '...')
+    t.equal(tools.toHex(bip39.mnemonicToSeedSync(vmnemonic, password)), vseedHex, 'mnemonicToSeedSync returns ' + vseedHex.slice(0, 40) + '...')
     bip39.mnemonicToSeed(vmnemonic, password).then(function (asyncSeed) {
-      t.equal(asyncSeed.toString('hex'), vseedHex, 'mnemonicToSeed returns ' + vseedHex.slice(0, 40) + '...')
+      t.equal(tools.toHex(asyncSeed), vseedHex, 'mnemonicToSeed returns ' + vseedHex.slice(0, 40) + '...')
     })
     t.equal(bip39.entropyToMnemonic(ventropy, wordlist), vmnemonic, 'entropyToMnemonic returns ' + vmnemonic.slice(0, 40) + '...')
 
@@ -128,8 +130,8 @@ test('UTF8 passwords', function (t) {
     var password = '㍍ガバヴァぱばぐゞちぢ十人十色'
     var normalizedPassword = 'メートルガバヴァぱばぐゞちぢ十人十色'
 
-    t.equal(bip39.mnemonicToSeedSync(vmnemonic, password).toString('hex'), vseedHex, 'mnemonicToSeedSync normalizes passwords')
-    t.equal(bip39.mnemonicToSeedSync(vmnemonic, normalizedPassword).toString('hex'), vseedHex, 'mnemonicToSeedSync leaves normalizes passwords as-is')
+    t.equal(tools.toHex(bip39.mnemonicToSeedSync(vmnemonic, password)), vseedHex, 'mnemonicToSeedSync normalizes passwords')
+    t.equal(tools.toHex(bip39.mnemonicToSeedSync(vmnemonic, normalizedPassword)), vseedHex, 'mnemonicToSeedSync leaves normalizes passwords as-is')
   })
 })
 

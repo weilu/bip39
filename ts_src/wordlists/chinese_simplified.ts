@@ -1,4 +1,4 @@
-export default [
+export const chineseSimplified = [
   '的',
   '一',
   '是',

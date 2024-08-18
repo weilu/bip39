@@ -1,4 +1,4 @@
-export default [
+export const korean = [
   '가격',
   '가끔',
   '가난',

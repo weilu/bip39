@@ -1,4 +1,4 @@
-export default [
+export const czech = [
   'abdikace',
   'abeceda',
   'adresa',

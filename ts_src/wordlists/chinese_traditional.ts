@@ -1,4 +1,4 @@
-export default [
+export const chineseTraditional = [
   '的',
   '一',
   '是',
