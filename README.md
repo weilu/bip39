@@ -1,6 +1,6 @@
 # BIP39
 
-[![Build Status](https://travis-ci.org/bitcoinjs/bip39.png?branch=master)](https://travis-ci.org/bitcoinjs/bip39)
+![](https://github.com/bitcoinjs/bip39/actions/workflows/main_ci.yml/badge.svg)
 [![NPM](https://img.shields.io/npm/v/bip39.svg)](https://www.npmjs.org/package/bip39)
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
@@ -16,80 +16,31 @@ When a checksum is invalid, warn the user that the phrase is not something gener
 
 However, there should be other checks in place, such as checking to make sure the user is inputting 12 words or more separated by a space. ie. `phrase.trim().split(/\s+/g).length >= 12`
 
-## Removing wordlists from webpack/browserify
+***Note that the `generateMnemonic()` function uses crypto.getRandomValues() under the hood which is still an experimental feature as of Node.js 18.19.0***. To make use of `generateMnemonic()` you can: 
+1. Use a polyfill for crypto.getRandomValues()
+2. Use the `--experimental-global-webcrypto` flag when running node.js.
+3. Pass in a custom function to generate random values. This can be done as follows: 
+```js
+ import * as bip39 from 'bip39'
+ import * as crypto from 'crypto'
 
- Browserify/Webpack bundles can get very large if you include all the wordlists, so you can now exclude wordlists to make your bundle lighter.
-
- For example, if we want to exclude all wordlists besides chinese_simplified, you could build using the browserify command below.
-
- ```bash
-$ browserify -r bip39 -s bip39 \
-  --exclude=./wordlists/english.json \
-  --exclude=./wordlists/japanese.json \
-  --exclude=./wordlists/spanish.json \
-  --exclude=./wordlists/italian.json \
-  --exclude=./wordlists/french.json \
-  --exclude=./wordlists/korean.json \
-  --exclude=./wordlists/czech.json \
-  --exclude=./wordlists/portuguese.json \
-  --exclude=./wordlists/chinese_traditional.json \
-   > bip39.browser.js
+ bip39.setDefaultWordlist(bip39.english)
+ bip39.generateMnemonic(128, (size) => (crypto.randomBytes(size)))
 ```
 
- This will create a bundle that only contains the chinese_simplified wordlist, and it will be the default wordlist for all calls without explicit wordlists.
+## Removing wordlists from the bundle
 
- You can also do this in Webpack 5 using the `IgnorePlugin`. Here is an example of excluding all non-English wordlists
+BIP39 is treeshakeable, this means that if you're using webpack or vite or any modern bundler, they will be removed from the bundle when it is built. 
 
- ```javascript
- ...
- plugins: [
-   new webpack.IgnorePlugin({
-      checkResource(resource) {
-        return /.*\/wordlists\/(?!english).*\.json/.test(resource)
-      }
-    }),
- ],
- ...
- ```
+For a list of supported wordlists check the wordlists folder. The name of the js file (minus the extension) is the name of the key to access the wordlist.
 
- This is how it will look in the browser console.
+***Note that unlike the previous versions there is no default wordlist, so you will need to set one before using the library.*** This is how it would look like: 
 
- ```javascript
-> bip39.entropyToMnemonic('00000000000000000000000000000000')
-"的 的 的 的 的 的 的 的 的 的 的 在"
-> bip39.wordlists.chinese_simplified
-Array(2048) [ "的", "一", "是", "在", "不", "了", "有", "和", "人", "这", … ]
-> bip39.wordlists.english
-undefined
-> bip39.wordlists.japanese
-undefined
-> bip39.wordlists.spanish
-undefined
-> bip39.wordlists.italian
-undefined
-> bip39.wordlists.french
-undefined
-> bip39.wordlists.korean
-undefined
-> bip39.wordlists.czech
-undefined
-> bip39.wordlists.portuguese
-undefined
-> bip39.wordlists.chinese_traditional
-undefined
-```
-
- For a list of supported wordlists check the wordlists folder. The name of the json file (minus the extension) is the name of the key to access the wordlist.
-
- You can also change the default wordlist at runtime if you dislike the wordlist you were given as default.
-
- ```javascript
-> bip39.entropyToMnemonic('00000000000000000000000000000fff')
-"あいこくしん　あいこくしん　あいこくしん　あいこくしん　あいこくしん　あいこくしん　あいこくしん　あいこくしん　あいこくしん　あいこくしん　あまい　ろんり"
-> bip39.setDefaultWordlist('italian')
-undefined
-> bip39.entropyToMnemonic('00000000000000000000000000000fff')
-"abaco abaco abaco abaco abaco abaco abaco abaco abaco abaco aforisma zibetto"
+```javascript
+import bip39 from 'bip39'
+bip39.setDefaultWordlist(bip39.english)
+bip39.entropyToMnemonic('00000000000000000000000000000000')
+// => abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about
 ```
 
 ## Installation
@@ -99,7 +50,12 @@ npm install bip39
 
 ## Examples
 ``` js
-// Generate a random mnemonic (uses crypto.randomBytes under the hood), defaults to 128-bits of entropy
+import * as bip39 from "bip39"
+
+// Sets the default wordlist to english
+bip39.setDefaultWordlist(bip39.english)
+
+// Generate a random mnemonic (uses crypto.getRandomValues() under the hood), defaults to 128-bits of entropy
 const mnemonic = bip39.generateMnemonic()
 // => 'seed sock milk update focus rotate barely fade car face mechanic mercy'
 
@@ -130,8 +86,8 @@ bip39.validateMnemonic('basket actual')
 
 ``` js
 const bip39 = require('bip39')
+bip39.setDefaultWordlist(bip39.english)
 
-// defaults to BIP39 English word list
 // uses HEX strings for entropy
 const mnemonic = bip39.entropyToMnemonic('00000000000000000000000000000000')
 // => abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about

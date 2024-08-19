@@ -18,7 +18,7 @@
     "skipLibCheck": true,
     "strict": true,
     "pretty": true,
-    "removeComments": true,
+    "removeComments": false,
     "strictNullChecks": true,
     "noImplicitAny": true,
     "noImplicitThis": true,

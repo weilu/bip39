@@ -21411,6 +21411,7 @@ function mnemonicToEntropy(mnemonic, wordlist) {
     if (words.length % 3 !== 0) {
         throw new Error(INVALID_MNEMONIC);
     }
+    // convert word indices to 11 bit binary strings
     const bits = words
         .map((word) => {
         const index = wordlist.indexOf(word);
@@ -21420,9 +21421,11 @@ function mnemonicToEntropy(mnemonic, wordlist) {
         return lpad(index.toString(2), '0', 11);
     })
         .join('');
+    // split the binary string into ENT/CS
     const dividerIndex = Math.floor(bits.length / 33) * 32;
     const entropyBits = bits.slice(0, dividerIndex);
     const checksumBits = bits.slice(dividerIndex);
+    // calculate the checksum and compare
     const entropyBytes = entropyBits.match(/(.{1,8})/g).map(binaryToByte);
     if (entropyBytes.length < 16) {
         throw new Error(INVALID_ENTROPY);
@@ -21448,6 +21451,7 @@ function entropyToMnemonic(entropy, wordlist) {
     if (!wordlist) {
         throw new Error(WORDLIST_REQUIRED);
     }
+    // 128 <= ENT <= 256
     if (entropy.length < 16) {
         throw new TypeError(INVALID_ENTROPY);
     }
@@ -21465,10 +21469,21 @@ function entropyToMnemonic(entropy, wordlist) {
         const index = binaryToByte(binary);
         return wordlist[index];
     });
-    return wordlist[0] === '\u3042\u3044\u3053\u304f\u3057\u3093'
+    return wordlist[0] === '\u3042\u3044\u3053\u304f\u3057\u3093' // Japanese wordlist
         ? words.join('\u3000')
         : words.join(' ');
 }
+/**
+ * Generates a mnemonic phrase based on the provided strength, random number generator, and wordlist.
+ * Uses `crypto.getRandomValues` under the hood, which is still an experimental feature as of Node.js 18.19.0. To work around this you can do one of the following:
+ * 1. Use a polyfill for crypto.getRandomValues()
+ * 2. Use the `--experimental-global-webcrypto` flag when running node.js.
+ * 3. Pass in a custom rng function to generate random values.
+ * @param {number} [strength=128] - The strength of the mnemonic phrase, must be a multiple of 32.
+ * @param {(size: number) => Uint8Array} [rng] - A custom random number generator, defaults to crypto.getRandomValues.
+ * @param {string[]} [wordlist] - A custom wordlist, defaults to the standard wordlist.
+ * @return {string} The generated mnemonic phrase.
+ */
 function generateMnemonic(strength, rng, wordlist) {
     strength = strength || 128;
     if (strength % 32 !== 0) {

@@ -1,5 +1,5 @@
-export { chineseSimplified } from './chinese_simplified.js';
-export { chineseTraditional } from './chinese_traditional.js';
+export { chineseSimplified } from './chineseSimplified.js';
+export { chineseTraditional } from './chineseTraditional.js';
 export { czech } from './czech.js';
 export { english } from './english.js';
 export { french } from './french.js';
