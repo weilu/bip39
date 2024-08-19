@@ -2,10 +2,19 @@
   "name": "bip39",
   "version": "3.1.0",
   "description": "Bitcoin BIP39: Mnemonic code for generating deterministic keys",
-  "main": "src/index.js",
-  "types": "./types/index.d.ts",
+  "type": "module",
+  "main": "src/cjs/index.cjs",
+  "module": "src/esm/index.js",
+  "types": "src/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/cjs/index.d.ts",
+      "import": "./src/esm/index.js",
+      "require": "./src/cjs/index.cjs"
+    }
+  },
   "scripts": {
-    "build": "npm run clean && tsc -p tsconfig.json",
+    "build": "rollup -c rollup.config.ts --configPlugin typescript",
     "clean": "rm -rf src",
     "coverage": "nyc --branches 85 --functions 100 --check-coverage npm run unit",
     "format": "npm run prettier -- --write",
@@ -14,7 +23,7 @@
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "prettier": "prettier 'ts_src/**/*.ts' --ignore-path ./.prettierignore",
     "test": "npm run build && npm run format:ci && npm run lint && npm run unit",
-    "unit": "tape test/*.js",
+    "unit": "tape test/index.js",
     "update": "node -e \"require('./util/wordlists').update()\""
   },
   "author": "Wei Lu",
@@ -31,20 +40,26 @@
   },
   "license": "ISC",
   "files": [
-    "src",
-    "types"
+    "src"
   ],
   "dependencies": {
-    "@noble/hashes": "^1.2.0"
+    "@noble/hashes": "^1.2.0",
+    "uint8array-tools": "^0.0.8"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "11.11.6",
     "node-fetch": "2.6.9",
     "nyc": "^15.0.0",
     "prettier": "1.16.4",
     "proxyquire": "^1.7.10",
-    "tape": "^4.13.2",
+    "rollup": "^4.9.6",
+    "tape": "^5.3.0",
     "tslint": "^6.1.0",
-    "typescript": "3.3.4000"
-  }
+    "typescript": "5.0.4"
+  },
+  "sideEffects": false
 }

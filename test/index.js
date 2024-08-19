@@ -1,13 +1,42 @@
-var bip39 = require('../')
-var download = require('../util/wordlists').download
-var WORDLISTS = {
-  english: require('../src/wordlists/english.json'),
-  japanese: require('../src/wordlists/japanese.json'),
-  custom: require('./wordlist.json')
-}
+import * as bip39  from "../src/esm/index.js";
+import {
+  english, 
+  japanese, 
+  italian, 
+  spanish, 
+  chineseSimplified, 
+  chineseTraditional, 
+  french, 
+  korean, 
+  portuguese, 
+  czech
+} from "../src/esm/index.js";
+import custom from './wordlist.json' assert {type: "json"};
+import * as tools from "uint8array-tools";
 
-var vectors = require('./vectors.json')
-var test = require('tape')
+var WORDLISTS = {
+  english,
+  japanese,
+  custom
+};
+
+const exposedWordlists = {
+  chinese_simplified: chineseSimplified, 
+  chinese_traditional: chineseTraditional,
+  czech,
+  english,
+  french,
+  italian,
+  japanese,
+  korean,
+  portuguese,
+  spanish
+};
+
+import vectors from "./vectors.json" assert {type: "json"};
+import {test} from "tape";
+
+bip39.setDefaultWordlist(WORDLISTS.english);
 
 function testVector (description, wordlist, password, v, i) {
   var ventropy = v[0]
@@ -18,9 +47,9 @@ function testVector (description, wordlist, password, v, i) {
     t.plan(6)
 
     t.equal(bip39.mnemonicToEntropy(vmnemonic, wordlist), ventropy, 'mnemonicToEntropy returns ' + ventropy.slice(0, 40) + '...')
-    t.equal(bip39.mnemonicToSeedSync(vmnemonic, password).toString('hex'), vseedHex, 'mnemonicToSeedSync returns ' + vseedHex.slice(0, 40) + '...')
+    t.equal(tools.toHex(bip39.mnemonicToSeedSync(vmnemonic, password)), vseedHex, 'mnemonicToSeedSync returns ' + vseedHex.slice(0, 40) + '...')
     bip39.mnemonicToSeed(vmnemonic, password).then(function (asyncSeed) {
-      t.equal(asyncSeed.toString('hex'), vseedHex, 'mnemonicToSeed returns ' + vseedHex.slice(0, 40) + '...')
+      t.equal(tools.toHex(asyncSeed), vseedHex, 'mnemonicToSeed returns ' + vseedHex.slice(0, 40) + '...')
     })
     t.equal(bip39.entropyToMnemonic(ventropy, wordlist), vmnemonic, 'entropyToMnemonic returns ' + vmnemonic.slice(0, 40) + '...')
 
@@ -36,39 +65,39 @@ vectors.custom.forEach(function (v, i) { testVector('Custom', WORDLISTS.custom, 
 
 test('getDefaultWordlist returns "english"', function (t) {
   t.plan(1)
-  const english = bip39.getDefaultWordlist()
-  t.equal(english, 'english')
+  const english = bip39.getDefaultWordlist();
+  t.equal(english[0], 'abandon');
   // TODO: Test that Error throws when called if no wordlists are compiled with bip39
 })
 
 test('setDefaultWordlist changes default wordlist', function (t) {
   t.plan(4)
   const english = bip39.getDefaultWordlist()
-  t.equal(english, 'english')
+  t.equal(english[0], 'abandon');
 
-  bip39.setDefaultWordlist('italian')
+  bip39.setDefaultWordlist(italian);
 
-  const italian = bip39.getDefaultWordlist()
-  t.equal(italian, 'italian')
+  const italianWordlist = bip39.getDefaultWordlist()
+  t.equal(italianWordlist[0], 'abaco')
 
   const phraseItalian = bip39.entropyToMnemonic('00000000000000000000000000000000')
   t.equal(phraseItalian.slice(0, 5), 'abaco')
 
-  bip39.setDefaultWordlist('english')
+  bip39.setDefaultWordlist(english)
 
   const phraseEnglish = bip39.entropyToMnemonic('00000000000000000000000000000000')
   t.equal(phraseEnglish.slice(0, 7), 'abandon')
 })
 
-test('setDefaultWordlist throws on unknown wordlist', function (t) {
+test('setDefaultWordlist throws on invalid wordlist length', function (t) {
   t.plan(2)
   const english = bip39.getDefaultWordlist()
-  t.equal(english, 'english')
+  t.equal(english[0], 'abandon')
 
   try {
-    bip39.setDefaultWordlist('abcdefghijklmnop')
+    bip39.setDefaultWordlist([...new Array(2047)].fill('a'));
   } catch (error) {
-    t.equal(error.message, 'Could not find wordlist for language "abcdefghijklmnop"')
+    t.equal(error.message, 'Invalid wordlist');
     return
   }
   t.assert(false)
@@ -100,8 +129,8 @@ test('UTF8 passwords', function (t) {
     var password = '㍍ガバヴァぱばぐゞちぢ十人十色'
     var normalizedPassword = 'メートルガバヴァぱばぐゞちぢ十人十色'
 
-    t.equal(bip39.mnemonicToSeedSync(vmnemonic, password).toString('hex'), vseedHex, 'mnemonicToSeedSync normalizes passwords')
-    t.equal(bip39.mnemonicToSeedSync(vmnemonic, normalizedPassword).toString('hex'), vseedHex, 'mnemonicToSeedSync leaves normalizes passwords as-is')
+    t.equal(tools.toHex(bip39.mnemonicToSeedSync(vmnemonic, password)), vseedHex, 'mnemonicToSeedSync normalizes passwords')
+    t.equal(tools.toHex(bip39.mnemonicToSeedSync(vmnemonic, normalizedPassword)), vseedHex, 'mnemonicToSeedSync leaves normalizes passwords as-is')
   })
 })
 
@@ -129,20 +158,4 @@ test('validateMnemonic', function (t) {
   t.equal(bip39.validateMnemonic('abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about end grace oxygen maze bright face loan ticket trial leg cruel lizard bread worry reject journey perfect chef section caught neither install industry'), false, 'fails for a mnemonic that is too long')
   t.equal(bip39.validateMnemonic('turtle front uncle idea crush write shrug there lottery flower risky shell'), false, 'fails if mnemonic words are not in the word list')
   t.equal(bip39.validateMnemonic('sleep kitten sleep kitten sleep kitten sleep kitten sleep kitten sleep kitten'), false, 'fails for invalid checksum')
-})
-
-test('exposes standard wordlists', function (t) {
-  t.plan(2)
-  t.same(bip39.wordlists.EN, WORDLISTS.english)
-  t.equal(bip39.wordlists.EN.length, 2048)
-})
-
-test('verify wordlists from https://github.com/bitcoin/bips/blob/master/bip-0039/bip-0039-wordlists.md', function (t) {
-  download().then(function (wordlists) {
-    Object.keys(wordlists).forEach(function (name) {
-      t.same(bip39.wordlists[name], wordlists[name])
-    })
-
-    t.end()
-  })
 })

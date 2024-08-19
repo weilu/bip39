@@ -1,34 +1,31 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "module": "commonjs",
-    "outDir": "./src",
-    "declaration": true,
-    "declarationDir": "./types",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
     "rootDir": "./ts_src",
-    "types": [
-      "node"
-    ],
-    "allowJs": false,
+    "outDir": "./src",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "importHelpers": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": false,
+    "skipLibCheck": true,
     "strict": true,
-    "noImplicitAny": true,
+    "pretty": true,
+    "removeComments": false,
     "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
+    "noImplicitAny": true,
     "noImplicitThis": true,
-    "alwaysStrict": true,
-    "esModuleInterop": false,
+    "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "resolveJsonModule": true
+    "noUnusedParameters": true
   },
-  "include": [
-      "ts_src/**/*.ts",
-      "ts_src/**/*.json"
-  ],
-  "exclude": [
-      "**/*.spec.ts",
-      "node_modules/**/*"
-  ]
+  "exclude": [ "node_modules", "test", "rollup.config.ts" ],
+  "include": ["ts_src/**/*.ts" ]
 }
